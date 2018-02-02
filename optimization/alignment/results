@@ -1,0 +1,29 @@
+in this repo: we can capitalize a character by adding 0x20 to it.
+
+loop unrolling is cool, but why not instruction unroll or something
+
+we can fit 8 bytes into a register and do operations on all 8 bytes 
+so why not put 8 chars from a char array into a 64 bit register 
+leveraging their contiguity and add
+    0x2020202020202020
+to it to capitalize everything since it's essentially doing 8 operations 
+in parallel and we can yank everything into a register in 1 memory accession
+instead of using 8 accessions.
+
+The reslts of the experiment on my system are as such.
+
+Didn't check the generated assembly from gcc, but the differences are still
+evident
+
+#+BEGIN_SRC zsh
+1 26895@halide ~/class/361/opt/alignment % ./test
+./naive  19.84s user 0.98s system 99% cpu 20.830 total
+./speed  3.27s user 1.06s system 99% cpu 4.336 total
+./test  23.12s user 2.05s system 99% cpu 25.179 total
+#+END_SRC
+
+it takes 4.80x as long to do this the naive way.
+
+some pretty serious issues are that this is doesn't work if we have to do anything
+based on the data and that spaces and punctuation are completely clobbered by this,
+but it's kinda cool as a POC.
